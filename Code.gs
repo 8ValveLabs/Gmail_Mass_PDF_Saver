@@ -15,6 +15,10 @@ function saveEmailsAsPDF(labelName, folderName) {
       throw 'No emails found in label "' + labelName + '".';
     }
 
+    var combinedBytes = [];
+
+
+
     for (var i = 0; i < threads.length; i++) {
       var thread = threads[i];
       var messages = thread.getMessages();
@@ -31,8 +35,14 @@ function saveEmailsAsPDF(labelName, folderName) {
           attached_PDF.setName(pdf.getName() + '| Attached File: ' + attached_PDF.getName());
           getFolder(folderName).createFile(attached_PDF);
         }  
+      
+      combinedBytes = combinedBytes.concat(pdf.getBytes()); // Collect PDF bytes
+
       }
     }
+
+    var combinedPdfBlob = Utilities.newBlob(combinedBytes.join(''), 'application/pdf', 'combined_thread.pdf');
+    getFolder(folderName).createFile(combinedPdfBlob);
 
     return 'Saved ' + threads.length + ' threads to folder "' + folderName + '".';
   } catch (error) {
